@@ -1,0 +1,7 @@
+
+
+.env
+.venv
+
+# don't commit model artifacts
+model/artifacts
