@@ -1,10 +1,11 @@
 pandas
 numpy
 torch
-sklearn
+scikit-learn
 matplotlib
 transformers
 datasets
 fastapi
 pydantic 
 joblib
+pytest 
