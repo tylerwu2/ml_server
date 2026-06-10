@@ -3,13 +3,22 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleWare 
 from prometheus_fastapi_instrumentator import Instrumentator 
 
-from schemas import HealthResponse, PredictResponse, BatchResponse
+from api.schemas import HealthResponse, PredictRequest, PredictResponse, BatchPredictRequest, BatchResponse
+from api.model_loader import ModelLoader
+from api.cache import PredictionCache
+from api.config import Settings
 
+model_loader = ModelLoader()
+cache = PredictionCache() 
+settings = Settings() 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # load model, connect to cache and yield 
-    await 
+    model_loader.load()
+    await cache.connect() 
+    yield 
+    await cache.close() 
 
 app = FastAPI("ML Server API", version="1.0.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleWare, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -17,12 +26,21 @@ Instrumentator.instrument(app).expose(app) # mounts .metrics for Prometheus
 
 @app.get("/health", response_model=HealthResponse)
 async def get_health():
-    await
+    return HealthResponse(
+        status = "ok",
+        model_loaded = model_loader.is_loaded,
+        cache_connected= await cache.ping(),
+    )
 
 @app.post("/predict", response_model=PredictResponse)
 async def predict():
-    await
+    if not model_loader.is_loaded: 
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    
+    cached = ... 
 
 @app.post("/batch", response_model=BatchResponse)
 async def batch_predict():
-    await
+    if not model_loader.is_loaded:
+        raise HTTPException(stauts_code=503, detail="Model not loaded")
+    predictions = ... 

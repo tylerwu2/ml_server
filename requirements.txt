@@ -9,3 +9,6 @@ fastapi
 pydantic 
 joblib
 pytest 
+redis
+prometheus-fastapi-instrumentator
+uvicorn
