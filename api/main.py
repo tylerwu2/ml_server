@@ -33,14 +33,24 @@ async def get_health():
     )
 
 @app.post("/predict", response_model=PredictResponse)
-async def predict():
+async def predict(request):
     if not model_loader.is_loaded: 
         raise HTTPException(status_code=503, detail="Model not loaded")
     
-    cached = ... 
+    cached_res = await cache.get(request.text)
+    if cached_res:
+        cached_res["cached"] = True 
+        return PredictResponse(**cached_res)
+    
+    res = model_loader.predict(request.text)
+    await cache.set(request.text, res)
+    return PredictResponse(**res, cached=False)
+
 
 @app.post("/batch", response_model=BatchResponse)
-async def batch_predict():
+async def batch_predict(requests):
     if not model_loader.is_loaded:
         raise HTTPException(stauts_code=503, detail="Model not loaded")
-    predictions = ... 
+    predictions = [PredictResponse(**model_loader.predict(t), cached=False) for t in requests.texts] 
+    return BatchResponse(predictions=predictions, responses=len(predictions))
+         
