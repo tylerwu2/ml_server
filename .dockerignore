@@ -1,0 +1,15 @@
+.git
+.github
+.env
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.ruff_cache
+model/notebooks/
+tests/
+infra/
+monitoring/
+*.md
+docker-compose.yml
