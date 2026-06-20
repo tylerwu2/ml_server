@@ -12,3 +12,4 @@ pytest
 redis
 prometheus-fastapi-instrumentator
 uvicorn
+httpx
